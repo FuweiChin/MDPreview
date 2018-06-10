@@ -3,7 +3,7 @@
   "description": "Preview Markdown(GitHub Flavoured)",
   "version": "0.1.0",
   "manifest_version": 2,
-  "minimum_chrome_version": "24.0.0",
+  "minimum_chrome_version": "45.0.0",
   "permissions": [ "storage" ],
   "browser_action": {
     "default_icon": "md.iconset/icon_38x38.png",
