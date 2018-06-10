@@ -1,0 +1,31 @@
+.enabled>.markdown-body {
+  display: block;
+}
+
+.enabled>.markdown-source {
+  display: none;
+}
+
+.disabled>.markdown-body {
+  display: none;
+}
+
+.disabled>.markdown-source {
+  display: block;
+}
+
+.markdown-body {
+  margin: 30px auto;
+  border: 1px solid #dddddd;
+  box-shadow:1px 1px 8px #c0c0c0;
+  box-sizing:border-box;
+  max-width: calc(21cm * 1.4709583133562356);
+  /*min-height: calc(29.7cm * 1.4709583133562356);*/
+  padding: calc(2.54cm * 1.4709583133562356) calc(1.91cm * 1.4709583133562356);
+}
+
+.markdown-source {
+  background: none;
+  margin: 0px;
+  padding: 0px;
+}
