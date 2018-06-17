@@ -1,6 +1,6 @@
 "use strict";
 
-if ([ "text/markdown", "text/x-markdown", "text/vnd.daringfireball.markdown" ].indexOf(document.contentType)>-1) {
+if ([ "text/plain", "text/markdown", "text/x-markdown", "text/vnd.daringfireball.markdown" ].indexOf(document.contentType)>-1) {
   main(window.marked, window.hljs, {
     enabled: true,
     watch: true,
@@ -58,7 +58,7 @@ function main(marked,hljs,settings) {
   // Add a listener waiting for enabled/disabled events
   chrome.storage.local.get(["enabled"], function(result) {
     settings.enabled=result.enabled===true;
-    document.body.setAttribute("class", result.enabled ? "enabled" : "disabled");
+    document.body.setAttribute("class", settings.enabled ? "enabled" : "disabled");
   });
   chrome.storage.onChanged.addListener(function(changes, namespace) {
     var change;

@@ -1,25 +1,25 @@
 {
   "name": "MDPreview",
-  "description": "Preview Markdown(GitHub Flavoured)",
-  "version": "0.1.0",
+  "description": "Preview Markdown(GitHub Flavored)",
+  "version": "0.1.1",
   "manifest_version": 2,
-  "minimum_chrome_version": "45.0.0",
   "permissions": [ "storage" ],
   "browser_action": {
     "default_icon": "md.iconset/icon_38x38.png",
     "default_title": "MDPreview"
   },
   "background": {
-    "scripts": [ "js/background.js" ]
+    "scripts": [ "background.js" ]
   },
   "content_scripts": [ {
     "matches": [ "http://*/*.md", "https://*/*.md", "file://*/*.md" ],
-    "js": [ "js/highlight.js", "js/marked.js", "js/plugin.js" ]
+    "js": [ "js/highlight.js", "js/marked.js", "content.js" ]
   } ],
   "icons": {
     "16": "md.iconset/icon_16x16.png",
     "48": "md.iconset/icon_48x48.png",
     "128": "md.iconset/icon_128x128.png"
   },
-  "web_accessible_resources": [ "css/default.css", "css/github.css", "css/markdown.css", "css/page.css", "img/loading.gif" ]
+  "web_accessible_resources": [ "css/default.css", "css/github.css", "css/markdown.css", "css/page.css" ],
+  "minimum_chrome_version": "45"
 }
