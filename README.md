@@ -1,5 +1,5 @@
 # MDPreview for Chrome
-MDPreview for Chrome is Chrome extension to preview Markdown files both locally or on the web. It is forked from [GitHub Flavored Markdown](https://chrome.google.com/webstore/detail/github-flavored-markdown/faelggnmhofdamhdegcdhhemfokkfngk).
+MDPreview for Chrome is Chrome extension to preview Markdown files locally or on the web. It is forked from [GitHub Flavored Markdown](https://chrome.google.com/webstore/detail/github-flavored-markdown/faelggnmhofdamhdegcdhhemfokkfngk).
 
 # Features
 Compared to GitHub Flavored Markdown v0.0.6, MDPreview for Chrome 0.1 made the following changes:  

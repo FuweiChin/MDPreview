@@ -1,3 +1,6 @@
+"use strict";
+var browser=window.browser||window.chrome;
+
 var settings={
   enabled: true,
   getIcon: function() {
@@ -5,19 +8,18 @@ var settings={
   }
 };
 
-chrome.storage.local.get(["enabled"], function(result) {
+// get initial enable/disable state and show corresponding icon
+browser.storage.local.get(["enabled"], (result)=>{
   // Save our "enabled" state
   settings.enabled=typeof result.enabled=="boolean"?result.enabled:true;
   // Set the main icon on startup
-  chrome.browserAction.setIcon(settings.getIcon());
+  browser.browserAction.setIcon(settings.getIcon());
 });
 
-// Wait for clicks on our icon
-chrome.browserAction.onClicked.addListener(function(tab) {
-  // Flip state
+// if icon clicked, enabled or disable the markdown preview
+browser.browserAction.onClicked.addListener((tab)=>{
   settings.enabled = !settings.enabled;
-  // Save state and notify any running tab
-  chrome.storage.local.set({enabled: settings.enabled}, function() {
-    chrome.browserAction.setIcon(settings.getIcon());
+  browser.storage.local.set({enabled: settings.enabled}, ()=>{
+    browser.browserAction.setIcon(settings.getIcon());
   });
 });

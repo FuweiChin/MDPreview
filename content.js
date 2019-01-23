@@ -1,30 +1,20 @@
 "use strict";
+if(!window.browser){window.browser=window.chrome;}
 
 if ([ "text/plain", "text/markdown", "text/x-markdown", "text/vnd.daringfireball.markdown" ].indexOf(document.contentType)>-1) {
-  main(window.marked, window.hljs, {
-    enabled: true,
-    watch: true,
-    watchInterval: 3000
-  });
+  main(window.marked, window.hljs);
 }
 
-function main(marked,hljs,settings) {
+function main(marked,hljs) {
   var md=null;
-  var watchHandle=undefined;
 
-  setReadyState("loading");
-
-  document.addEventListener("visibilitychange",function(){
-    if(document.visibilityState=="visible"){
-      resume();
-    }else{
-      suspend();
-    }
-  });
-  
   // Add our stylesheets
   document.head.insertAdjacentHTML("beforeend", [ "css/default.css", "css/github.css", "css/markdown.css", "css/page.css" ]
-      .map(function(href){return '<link rel="stylesheet" href="'+chrome.extension.getURL(href)+'"/>';}).join(""));
+      .map(function(href){return '<link rel="stylesheet" href="'+browser.runtime.getURL(href)+'"/>\n';}).join(""));
+  // set enable state
+  browser.storage.local.get(["enabled"], function(result) {
+    document.body.setAttribute("class", result.enabled==true ? "enabled" : "disabled");
+  });
 
   // Get a list of valid languages
   var languages = {};
@@ -54,35 +44,43 @@ function main(marked,hljs,settings) {
     md = pre&&pre.firstChild&&pre.firstChild.nodeValue||"";
     render(md);
   }
-
-  // Add a listener waiting for enabled/disabled events
-  chrome.storage.local.get(["enabled"], function(result) {
-    settings.enabled=result.enabled===true;
-    document.body.setAttribute("class", settings.enabled ? "enabled" : "disabled");
-  });
-  chrome.storage.onChanged.addListener(function(changes, namespace) {
+  // listen enabled/disabled change
+  browser.storage.onChanged.addListener(function(changes, namespace) {
     var change;
     if(namespace=="local"&&(change=changes.enabled)){
-      settings.enabled=change.newValue;
-      document.body.setAttribute("class", settings.enabled ? "enabled" : "disabled");
+      document.body.setAttribute("class", change.newValue ? "enabled" : "disabled");
     }
   });
 
   // Recreate the body given some markdown text
   function render(markdown) {
-    setReadyState("interactive");
-    var highlighted = hljs.highlight("markdown", markdown, true).value;
+    setReadyState("loading");
+    var escaped=escapeHTML(markdown);
     var rendered = marked.parse(markdown);
-    document.body.innerHTML = '<pre class="hljs markdown markdown-source">' + highlighted + '</pre><article class="markdown-body">' + rendered + "</article>";
+    document.body.innerHTML = '<pre class="hljs markdown markdown-source">' + escaped + '</pre><article class="markdown-body">' + rendered + "</article>";
     md=markdown;
     setReadyState("complete");
   }
 
+  function escapeHTML(text){
+    return text.replace(/[<>&"]/g,function(c){
+      switch(c){
+        case "<":return "&lt;";
+        case ">":return "&gt;";
+        case "&":return "&amp;";
+        case "\"":return "&quot;";
+      }
+    });
+  }
+
   //fetch file and check file modification
-  function reload() {
+  function reloadIfNeccessary() {
+    if(document.hidden)
+      return;
     var xhr = new XMLHttpRequest();
     xhr.open("GET", location.href, true);
     xhr.onload = function() {
+      console.log(xhr.getAllResponseHeaders());
       var text = xhr.responseText;
       if (text == md) return;
       console.debug("Changes detected on " + location.href);
@@ -95,37 +93,40 @@ function main(marked,hljs,settings) {
   function setReadyState(readyState){
     switch(readyState){
     case "loading":
-      document.body.style.visibility="hidden";
       document.title="Loading..";
       break;
-    case "interactive":
-      document.title="Processing..";
-      break;
     case "complete":
-      document.body.style.visibility="";
       //set title
       var h1=document.body.querySelector('.markdown-body h1,.markdown-body h2');
       document.title=h1?h1.textContent:"";
+      if(document.doctype==null){
+        var doctype = document.implementation.createDocumentType("html", "-//W3C//DTD XHTML 1.0 Transitional//EN", "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd");
+        document.insertBefore(doctype, document.childNodes[0]);
+      }
       //set language
-      chrome.i18n.detectLanguage(md,function(result){
-        var confident=result.languages.find(function(item){
-          return item.percentage>70;
-        })
-        if(confident){
-          document.documentElement.lang=confident.language;
+      if(browser.i18n.detectLanguage){
+        browser.i18n.detectLanguage(md,function(result){
+          var confident=result.languages.find(function(item){
+            return item.percentage>70;
+          });
+          if(confident){
+            document.documentElement.lang=confident.language;
+          }
+        });
+      }
+      //find broken link
+      Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'),function(a){
+        if(a.ownerDocument.getElementById(a.getAttribute("href").substring(1))==null){
+          a.classList.add("broken");
+        }
+      });
+      // disable href-textContent duplicated link
+      Array.prototype.forEach.call(document.querySelectorAll('a[href^="http://"],a[href^="https://"]'),function(a){
+        if(a.getAttribute("href")==a.textContent){//FIXME
+          a.removeAttribute("href");
         }
       });
       break;
-    }
-  }
-  function suspend(){
-    watchHandle=clearInterval(watchHandle);
-  }
-  function resume(){
-    // Set a timer checking for file (only) changes
-    if (location.protocol=="file:" && settings.watch) {
-      console.debug("Checking for changes on "+location.href+" every "+(settings.watchInterval/1000)+" seconds");
-      watchHandle=window.setInterval(reload, settings.watchInterval);
     }
   }
 }

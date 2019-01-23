@@ -29,3 +29,18 @@
   margin: 0px;
   padding: 0px;
 }
+
+a[href^="#"]::after{
+	content:"#";
+	display:inline-block;
+	color:#cccccc;
+}
+a[href="#"].broken{
+	color:darkred;
+}
+a[target="_blank"]::after{
+	content:"\00A0";
+	display:inline-block;
+	width:12px;
+	background: url("../img/_blank_link.svg") no-repeat left center;
+}
