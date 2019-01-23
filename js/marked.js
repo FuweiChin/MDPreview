@@ -1282,5 +1282,5 @@ if (typeof module !== 'undefined' && typeof exports === 'object') {
 }
 
 }).call(function() {
-  return this || (typeof window !== 'undefined' ? window : global);
+  return (typeof self !== 'undefined' ? self : this);
 }());

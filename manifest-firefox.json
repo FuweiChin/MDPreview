@@ -24,5 +24,10 @@
     "128": "md.iconset/icon_128x128.png"
   },
   "web_accessible_resources": [ "css/default.css", "css/github.css", "css/markdown.css", "css/page.css", "img/_blank_link.svg"],
-  "minimum_chrome_version": "45"
+  "applications": {
+    "gecko": {
+      "id": "mdpreview@bldgos.net",
+      "strict_min_version": "42"
+    }
+  }
 }
